@@ -28,9 +28,15 @@ module.exports = {
                 use: ["style-loader", "css-loader"]
             },
             {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: "asset/resource",
+            }
+
+            ,
+            {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                type: "javascript/auto",  
+                type: "javascript/auto",
                 use: {
                     loader: "babel-loader",
                     options: {

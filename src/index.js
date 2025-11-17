@@ -135,14 +135,14 @@ function loader() {
         const dayslastmonth = MonthsInfo[Default.index - 1].days;
         const div = document.createElement("div");
         div.className = "day prev";
-        div.innerHTML = dayslastmonth - Numlastmonthday + d;
+        div.innerHTML = toPersianNumber(dayslastmonth - Numlastmonthday + d);
         CalenderdatesEL.appendChild(div);
     };
     //Make the days of default month
     for (let d = 1; d <= Default.days; d++) {
         const div = document.createElement("div");
         div.className = "day current";
-        div.innerText = d;
+        div.innerText = toPersianNumber(d);
         //Change the color of holidays
         const weekday = (Numlastmonthday + (d - 1)) % 7;
         if (weekday === 6) {
@@ -155,7 +155,7 @@ function loader() {
     loadEvents();
     //Control Calender Month and Year
     MonthNameEL.innerHTML = `${Default.name}`;
-    YearEL.innerHTML = `${Default.year}`
+    YearEL.innerHTML = `${toPersianNumber(Default.year)}`
 
 
 };
@@ -174,10 +174,17 @@ function loadEvents(month = "aban") {
         const li = document.createElement("li");
         li.className = "event-item";
         li.innerHTML = `
-          <span class="event-day">${event.day} آبان</span>
+          <span class="event-day">${toPersianNumber(event.day)} آبان</span>
             <span class="event-title">${event.title}</span>
         `;
         MonthEnvent.appendChild(li);
     });
 }
+//Change number to persian
+function toPersianNumber(num) {
+    return num.toString().replace(/[0-9]/g, d => 
+        "۰۱۲۳۴۵۶۷۸۹"[d]
+    );
+}
+
 loader();
