@@ -1,6 +1,66 @@
 import "./style.css";
 import data from "./data.json";
+import {toJalaali,toGregorian} from 'jalaali-js';
 
+
+//document.addEventListener('DOMContentLoaded', () => {
+
+  const body = document.body;
+  const media = document.createElement('div');
+  media.className = 'media';
+
+  const datesInformation = document.createElement('div');
+  datesInformation.className = 'dates_information';
+  datesInformation.id = 'datesInfo';
+
+  const datesInfoHeader = document.createElement('header');
+  datesInfoHeader.id = 'dates_info_header';
+
+  const datesInfoList = document.createElement('ul');
+  datesInfoList.id = 'dates_info_list';
+
+  datesInformation.append(datesInfoHeader, datesInfoList);
+
+  const mainCalender = document.createElement('div');
+  mainCalender.className = 'main_calender';
+  mainCalender.id = 'main';
+
+  const header = document.createElement('header');
+  header.className = 'calender_header';
+  header.id = 'header';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.id = 'prev_button';
+  prevBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+
+  const nextBtn = document.createElement('button');
+  nextBtn.id = 'next_button';
+  nextBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+  const monthYearDiv = document.createElement('div');
+  monthYearDiv.className = 'month_year';
+
+  const monthSpan = document.createElement('span');
+  monthSpan.id = 'monthName';
+
+  const yearSpan = document.createElement('span');
+  yearSpan.id = 'year';
+
+  monthYearDiv.append(monthSpan, ' ', yearSpan);
+  header.append(prevBtn, monthYearDiv, nextBtn);
+
+
+  const calenderBody = document.createElement('div');
+  calenderBody.className = 'calender_dates';
+  calenderBody.id = 'body';
+
+  mainCalender.append(header, calenderBody);
+  media.append(datesInformation, mainCalender);
+
+  
+  body.appendChild(media);
+
+  
+// });
 
 const CalenderdatesEL = document.getElementById("body");
 const MonthNameEL = document.getElementById("monthName");
@@ -9,182 +69,149 @@ const PrevButtonEL = document.getElementById("prev_button");
 const NextButtonEL = document.getElementById("next_button");
 const MonthEnvent = document.getElementById("dates_info_list");
 const Enventheader = document.getElementById("dates_info_header");
-
 const MonthsInfo = {
-    0: {
-        name: "فروردین",
-        days: 31
-    },
-    1: {
-        name: "اردیبهشت",
-        days: 31
-    },
-    2: {
-        name: "خرداد",
-        days: 31
-    },
-    3: {
-        name: "تیر",
-        days: 31
-    },
-    4: {
-        name: "مرداد",
-        days: 31
-    },
-    5: {
-        name: "شهریور",
-        days: 31
-    },
-    6: {
-        name: "مهر",
-        days: 30
-    },
-    7: {
-        name: "آبان",
-        days: 30
-    },
-    8: {
-        name: "آذر",
-        days: 30
-    },
-    9: {
-        name: "دی",
-        days: 30
-    },
-    10: {
-        name: "بهمن",
-        days: 30
-    },
-    11: {
-        name: "اسفند",
-        days: 29
-    }
+    0: "فروردین",
+    1: "اردیبهشت",
+    2: "خرداد",
+    3: "تیر",
+    4: "مرداد",
+    5: "شهریور",
+    6: "مهر",
+    7: "آبان",
+    8: "آذر",
+    9: "دی",
+    10: "بهمن",
+    11: "اسفند"
 };
-const eventsData = {
-    "aban": [{
-            "day": 1,
-            "title": "روز آمار و برنامه‌ریزی"
-        },
-        {
-            "day": 1,
-            "title": "روز بزرگداشت ابوالفضل بیهقی,تاریخ نگار و نویسنده ایرانی"
-        },
-        {
-            "day": 5,
-            "title": "ولادت حضرت زینب (س) و روز پرستار و بهروز"
-        },
-        {
-            "day": 7,
-            "title": "سالروز ورود کوروش بزرگ به بابل در سال 539 پیش از اسلام"
-        },
-        {
-            "day": 8,
-            "title": "روز ملی محیط‌بان"
-        },
-        {
-            "day": 10,
-            "title": "ابان روز,جشن ابانگان"
-        },
-        {
-            "day": 14,
-            "title": "روز ملی مازندران"
-        },
-        {
-            "day": 15,
-            "title": "جشن میانه پاییز"
-        },
-        {
-            "day": 18,
-            "title": "روز ملی کیفیت"
-        },
-        {
-            "day": 23,
-            "title": "روز جهانی دیابت"
-        },
-        {
-            "day": 24,
-            "title": "روز کتاب و کتابخوانی"
-        },
-        {
-            "day": 26,
-            "title": "روز جهانی دانش‌آموز"
-        },
-        {
-            "day": 28,
-            "title": "روز جهانی آقایان"
-        },
-        {
-            "day": 29,
-            "title": "روز جهانی کودک"
-        }
-    ]
-}
+//Change number to persian
+function toPersianNumber(num) {
+    return num.toString().replace(/[0-9]/g, d =>
+        "۰۱۲۳۴۵۶۷۸۹" [d]
+    );
+};
+//Calculate Months days
+function isLeapJalali(jy) {
+    const kabisePattern = [1, 5, 9, 13, 17, 22, 26, 30];
+    if (kabisePattern.includes(jy % 33)) {
+        return true;
+    }
+    return false;
+};
+function getJalaliMonthDays(jy, jm) {
+    if (jm <= 6) return 31;
+    if (jm <= 11) return 30;
+    return isLeapJalali(jy) ? 30 : 29; // اسفند
+};
+//Find jalali date
+const formatter = new Intl.DateTimeFormat('fa-IR-u-nu-latn', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric'
+});
+const parts = formatter.formatToParts(new Date());
+let jy = +parts.find(p => p.type === "year").value;
+let jm = +parts.find(p => p.type === "month").value - 1;
+let jd = +parts.find(p => p.type === "day").value;
+//Calculate Start month weekday
+function getStartOfJalaliMonthWeekday(jy, jm) {
+    // تبدیل «روز اول ماه شمسی» به میلادی
+    const g = toGregorian(jy, jm + 1, 1);
+    console.log(g)
+console.log(new Date(g.gy, g.gm-1 , g.gd));
+    // گرفتن روز هفته میلادی
+    const weekday = new Date(g.gy, g.gm-1 , g.gd).getDay();
+console.log("w",weekday);
+    // تبدیل استاندارد به شمسی (شنبه = 0)
+    return (weekday + 1) % 7;
+};
+
+
+
+
 
 //loader function for load the page for first time
 function loader() {
-    //Default Month when open
-    const Default = {
-        index: 7,
-        name: "آبان",
-        days: 30,
-        year: 1404
-    };
-    const Numlastmonthday = 35 - MonthsInfo[7].days;
+    CalenderdatesEL.innerHTML = ""
+    const days = getJalaliMonthDays(jy, jm);
+    let startMonthDay = getStartOfJalaliMonthWeekday(jy, jm);
+    
+    console.log(startMonthDay);
+    let prevMonth = jm === 0 ? 11 : jm - 1;
+    let prevYear = jm === 0 ? jy - 1 : jy;
+    const prevMonthDays = getJalaliMonthDays(prevYear, prevMonth);
+
     //Make the datys of the last month
-    for (let d = 1; d <= Numlastmonthday; d++) {
-        const dayslastmonth = MonthsInfo[Default.index - 1].days;
+    for (let d = 1; d <= startMonthDay; d++) {
+        //Weekday calculation for the last month days
+
         const div = document.createElement("div");
         div.className = "day prev";
-        div.innerHTML = toPersianNumber(dayslastmonth - Numlastmonthday + d);
+        div.innerHTML = toPersianNumber(prevMonthDays - startMonthDay + d);
         CalenderdatesEL.appendChild(div);
     };
     //Make the days of default month
-    for (let d = 1; d <= Default.days; d++) {
+    for (let d = 1; d <= days; d++) {
         const div = document.createElement("div");
         div.className = "day current";
         div.innerText = toPersianNumber(d);
         //Change the color of holidays
-        const weekday = (Numlastmonthday + (d - 1)) % 7;
+        const weekday = (startMonthDay + (d - 1)) % 7;
         if (weekday === 6) {
             div.classList.add("holiday");
         }
         CalenderdatesEL.appendChild(div);
     };
     //Control Envents header
-    Enventheader.innerHTML = `مناسب های ${Default.name} ماه`
-    loadEvents();
-    //Control Calender Month and Year
-    MonthNameEL.innerHTML = `${Default.name}`;
-    YearEL.innerHTML = `${toPersianNumber(Default.year)}`
+    Enventheader.innerHTML = `مناسب های ${MonthsInfo[jm]} ماه`
 
+    //Control Calender Month and Year
+    MonthNameEL.innerHTML = `${MonthsInfo[jm]}`;
+    YearEL.innerHTML = `${toPersianNumber(jy)}`
+    loadEvents(jm);
 
 };
+loader();
+//Next Button 
+NextButtonEL.addEventListener("click", () => {
+    jm++;
+    if (jm > 11) {
+        jm = 0;
+        jy++;
+    }
 
-function loadEvents(month = "aban") {
+    loader();
+});
+//Prev Button
+PrevButtonEL.addEventListener("click", () => {
+    jm--;
+    if (jm < 0) {
+        jm = 11;
+        jy--;
+    }
+    loader();
+
+});
+
+//Load Envent Month
+function loadEvents(monthIndex) {
     MonthEnvent.innerHTML = "";
 
-    const events = eventsData[month];
+    const events = data.events[monthIndex];
 
     if (!events || events.length === 0) {
         return;
     }
 
     events.sort((a, b) => a.day - b.day);
+
     events.forEach(event => {
         const li = document.createElement("li");
         li.className = "event-item";
         li.innerHTML = `
-          <span class="event-day">${toPersianNumber(event.day)} آبان</span>
+            <span class="event-day">${toPersianNumber(event.day)} ${MonthsInfo[monthIndex]}</span>
             <span class="event-title">${event.title}</span>
         `;
         MonthEnvent.appendChild(li);
     });
-}
-//Change number to persian
-function toPersianNumber(num) {
-    return num.toString().replace(/[0-9]/g, d => 
-        "۰۱۲۳۴۵۶۷۸۹"[d]
-    );
-}
+};
 
-loader();
